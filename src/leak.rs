@@ -22,7 +22,7 @@ impl<T> Stack<T> {
 
 impl<T> StackOp for Stack<T> {
     type Item = T;
-    fn pop(&mut self) -> Option<T> {
+    fn pop(&self) -> Option<T> {
         loop {
             let head = self.head.load(Acquire);
             if head == ptr::null_mut() {
@@ -36,7 +36,7 @@ impl<T> StackOp for Stack<T> {
             }
         }
     }
-    fn push(&mut self, t: T) {
+    fn push(&self, t: T) {
         let n = Box::into_raw(Box::new(Node {
             data: t,
             next: ptr::null_mut(),
