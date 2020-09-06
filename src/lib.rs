@@ -1,6 +1,7 @@
 #![feature(test)]
 mod leak;
 mod lock;
+mod treiber;
 
 extern crate test;
 
@@ -47,6 +48,17 @@ mod tests {
             push_pop(&*s);
             th.join().unwrap();
             assert_eq!(s.pop(), None);
+        });
+    }
+    #[bench]
+    fn treiber(b: &mut Bencher) {
+        let s = Arc::new(treiber::Stack::new());
+        b.iter(|| {
+            let s2 = Arc::clone(&s);
+            let th = thread::spawn(move || push_pop(&*s2));
+            push_pop(&*s);
+            th.join().unwrap();
+            assert!(s.pop().is_none());
         });
     }
 }
